@@ -1,0 +1,48 @@
+body {
+  display: flex;
+  background-color: #ccc;
+}
+
+.app {
+  padding: 10px;
+  margin: auto;
+  background-color: white;
+}
+
+.result {
+  height: 80px;
+  margin-bottom: 10px;
+  background-color: #333;
+  font-size: 48px;
+  padding: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+.controls {
+  padding: 1px;
+  background-color: #333;
+}
+
+.row {
+  display: flex;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  margin: 1px;
+  background-color:white;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #eee;
+}
+
+.line {
+  flex: 1;
+}

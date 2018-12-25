@@ -1,0 +1,24 @@
+{
+  "nubmers" : {
+    "one" : {"value" : 1, "atrb" : ""},
+    "two" : {"value" : 2, "atrb" : ""},
+    "three" : {"value" : 3, "atrb" : ""},
+    "four" : {"value" : 4, "atrb" : ""},
+    "five" : {"value" : 5, "atrb" : ""},
+    "six" : {"value" : 6, "atrb" : ""},
+    "seven" : {"value" : 7, "atrb" : ""},
+    "eight" : {"value" : 8, "atrb" : ""},
+    "nine" : {"value" : 9, "atrb" : ""},
+    "zero" : {"value" : 0, "atrb" : ""}
+  },
+  "actions" : [
+    {"value" : "AC", "atrb" : ""},
+    {"value" : "+/-", "atrb" : ""},
+    {"value" : "%", "atrb" : ""},
+    {"value" : "/;", "atrb" : ""},
+    {"value" : "*", "atrb" : ""},
+    {"value" : "-", "atrb" : ""},
+    {"value" : "+", "atrb" : ""},
+    {"value" : "=", "atrb" : ""}
+  ]
+}
