@@ -1,46 +1,12 @@
 class Calculator { 
   constructor() {
-    this.currentOperation = { operandA: [], operandB: [], operator: null, result: null };
+    this.currentOperation = { a: null, b: null, operator: null, result: null};
     this.operationsHistory = [];
-  }
-
-  handleNumberClick(value) {
-    let { operandA, operandB, operator} = this.currentOperation;
-    if (!operator) {
-      operandA.push(value);
-    } else {
-      operandB.push(value);
-    }
-    this.updateWindow(operandB.length === 0 ? operandA.join('') : operandB.join(''));
-    return;
-  }
-
-  handleOperationClick(value) {
-    let { operandA, operandB } = this.currentOperation;
-    this.currentOperation.operator = value;
-    // debugger
-    if (value === "clear") {
-      this.clearOperation();
-      this.updateWindow(0);
-      return;
-    }
-    if (operandA.length > 0 && operandB.length > 0) {
-      this.executeOperation();
-      // debugger
-    }
-    return;
+    this.input = [];
   }
   
-  updateWindow(value) {
-    resultNode.innerHTML = value;
-    return;
-  }
+  //Operation Types
 
-  clearOperation() {
-    this.currentOperation = { operandA: [], operandB: [], operator: null };
-    return;
-  }
-  
   divide(a, b) {
     return a / b;
   }
@@ -61,27 +27,60 @@ class Calculator {
     return this.executeOperation();
   }
 
-  executeOperation() {
-    const { operandA, operandB, operator } = this.currentOperation;
-    const a = parseInt(operandA.join(''), 10);
-    const b = parseInt(operandB.join(''), 10);
-    const result = this[operator](a, b);
-    this.updateWindow(result);
-    
-    return result;
+  ac() {
+    return ;
+  }
+  
+  percent() {
+    return ;
   }
 
-  setNextOperation(operation) {
-    let { operandA, operandB, operator} = operation;
-    
-    if (!operation) {
-      this.clearOperation()
-    } else {
-      this.clearOperation(); 
-      this.currentOperation.operandA = [result];
-    }
+  handleNumberClick(value) {
+    this.input.push(value);
+    this.updateScoreboard(this.input.join(''));
+    return ;
+  }
+
+  handleOperatorClick(value) {
+    let { operator } = this.currentOperation;
+    this.currentOperation.operator = operator ? operator : value;
+    if (!this.currentOperation.a) {
+        this.currentOperation.a = parseInt(this.input.join(''), 10);
+        this.input = [];
+      } else {
+        this.currentOperation.b = parseInt(this.input.join(''), 10);
+        this.executeOperation(this.currentOperation);
+      }
+    return;
+  }
+  
+  updateScoreboard(value) {
+    resultNode.innerHTML = value;
+    return;
+  }
+
+  clearOperation() {
+    this.currentOperation = { a: null, b: null, operator: null, result: null };
+    return;
+  }
+
+  executeOperation(operation) {
+    let { a, b, operator} = operation;
+    const result = this[operator](a, b);
+    this.currentOperation.result = result;
+    this.updateScoreboard(result);
+    this.setNextOperation(result);
+    return;
+  }
+
+  setNextOperation(result) {
+    this.clearOperation(); 
+    this.currentOperation.a = result;
+    this.input = [];
+    debugger
   }
 }
+
 
 let calc = new Calculator;
 
@@ -94,36 +93,7 @@ controlsNode.onclick = function(e) {
   
   if (target.classList.contains("number")) {
     calc.handleNumberClick(value)
-  } else if (target.classList.contains("operation")) {
-    calc.handleOperationClick(value);
+  } else if (target.classList.contains("operator")) {
+    calc.handleOperatorClick(value);
   } else return;
 }
-
-// handleNumberClick(value) {
-//   const { operandA, operandB, operationType } = this.currentOperation;
-//   const number = +value;
-//   if (!operationType) {
-//     operandA.push(number);
-//     this.updateResult(operandA.join(''));
-//   } else {
-//     if (operandA.length === 0) {
-//       this.clearOperationInfo();
-//       return;
-//     }
-//     operandB.push(number);
-//     this.updateResult(operandB.join(''));
-//   }
-// }
-
-// handleOperationClick(value) {
-//   if (value === "clear") {
-//     this.clearOperationInfo();
-//   }
-//   let { operationType } = this.currentOperation;
-//   if (!operationType) {
-//     operationType = value;
-//   } else {
-//     const operationInfo = this.getOperationInfo();
-//     this.count(operationInfo);
-//   }
-// }
