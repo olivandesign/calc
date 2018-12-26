@@ -11,29 +11,34 @@ class Calculator {
     } else {
       operandB.push(value);
     }
-    console.log(this.currentOperation);
     this.updateWindow(operandB.length === 0 ? operandA.join('') : operandB.join(''));
+    return;
   }
 
   handleOperationClick(value) {
-    let { operator } = this.currentOperation;
-    if (operator === "clear") {
-      this.newOperation();
+    let { operandA, operandB } = this.currentOperation;
+    this.currentOperation.operator = value;
+    // debugger
+    if (value === "clear") {
+      this.clearOperation();
       this.updateWindow(0);
       return;
     }
-    if (!operator) {
-      this.currentOperation.operator = value;
-      console.log(this.currentOperation.operator);
-    } else this.executeOperation();
+    if (operandA.length > 0 && operandB.length > 0) {
+      this.executeOperation();
+      // debugger
+    }
+    return;
   }
   
   updateWindow(value) {
     resultNode.innerHTML = value;
+    return;
   }
 
-  newOperation() {
-    this.currentOperation = { operandA: [], operandB: [], operator: null, result: null };
+  clearOperation() {
+    this.currentOperation = { operandA: [], operandB: [], operator: null };
+    return;
   }
   
   divide(a, b) {
@@ -52,16 +57,29 @@ class Calculator {
     return a + b;
   }
 
+  result() {
+    return this.executeOperation();
+  }
+
   executeOperation() {
     const { operandA, operandB, operator } = this.currentOperation;
-    const a = +operandA.join('');
-    const b = +operandB.join('');
-    const operationType = operator
-    const result = this[operationType](a, b);
-    this.currentOperation.result = result
+    const a = parseInt(operandA.join(''), 10);
+    const b = parseInt(operandB.join(''), 10);
+    const result = this[operator](a, b);
     this.updateWindow(result);
-    this.newOperation();
-    this.currentOperation.operandA = result;
+    
+    return result;
+  }
+
+  setNextOperation(operation) {
+    let { operandA, operandB, operator} = operation;
+    
+    if (!operation) {
+      this.clearOperation()
+    } else {
+      this.clearOperation(); 
+      this.currentOperation.operandA = [result];
+    }
   }
 }
 
