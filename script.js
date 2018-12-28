@@ -1,8 +1,6 @@
 class Calculator { 
   constructor() {
-    this.currentOperation = { a: null, b: null, operator: null, result: null};
-    this.operationsHistory = [];
-    this.input = [];
+
   }
   
   //Operation Types
@@ -22,62 +20,100 @@ class Calculator {
   add(a, b) {
     return a + b;
   }
-
-  result() {
-    return this.executeOperation();
-  }
-
-  ac() {
-    return ;
-  }
   
   percent() {
     return ;
   }
 
-  handleNumberClick(value) {
-    this.input.push(value);
-    this.updateScoreboard(this.input.join(''));
-    return ;
+  // Click Handlers
+
+  addNumber(number) {
+    const { inputSessionIsClosed } = this.currentOperation;
+    if (inputSessionIsClosed) {
+      this.createNewInputSession();
+    }
+    this.currentOperation.input.push(number);
+    return;
   }
 
-  handleOperatorClick(value) {
-    let { operator } = this.currentOperation;
-    this.currentOperation.operator = operator ? operator : value;
-    if (!this.currentOperation.a) {
-        this.currentOperation.a = parseInt(this.input.join(''), 10);
-        this.input = [];
-      } else {
-        this.currentOperation.b = parseInt(this.input.join(''), 10);
-        this.executeOperation(this.currentOperation);
-      }
+  addOperationType(value) {
+    this.currentOperation.operationType = value;
     return;
   }
   
-  updateScoreboard(value) {
-    resultNode.innerHTML = value;
+  handleControlClick(value) {
+    if (value === "clear") {
+      this.createNewOperation();
+    } else if (value === "result") {
+      this.convertInputToOperand();
+      this.executeOperation();
+    } else return;
+  }
+  
+  //Input / Output Services
+  createNewInputSession() {
+    this.currentOperation.inputSessionIsClosed = false;
+    this.currentOperation.input = [];
+  }
+  
+  closeInputSession() {
+    this.currentOperation.inputSessionIsClosed = true;
+    this.convertInputToOperand();
+  }
+  
+  convertInputToOperand () {
+    const { input, operandA } = this.currentOperation;
+    if (!operandA) {
+      this.currentOperation.operandA = parseInt(input.join(''), 10);
+    } else {
+      this.currentOperation.operandB = parseInt(input.join(''), 10);
+    }
+  }
+  
+  updateOutput() {
+    const { input, result } = this.currentOperation;
+    console.log(result);
+    const output = result ? result : input.join('');
+    resultNode.innerHTML = output;
     return;
   }
-
-  clearOperation() {
-    this.currentOperation = { a: null, b: null, operator: null, result: null };
-    return;
-  }
-
-  executeOperation(operation) {
-    let { a, b, operator} = operation;
-    const result = this[operator](a, b);
+  
+  //Operation Services
+  
+  executeOperation() {
+    let { operandA, operandB, operationType} = this.currentOperation;
+    const result = this[operationType](operandA, operandB);
     this.currentOperation.result = result;
-    this.updateScoreboard(result);
-    this.setNextOperation(result);
+    this.setNextOperation();
     return;
   }
+  
+  setNextOperation() {
+    const result = this.currentOperation.result;
+    this.createNewOperation(); 
+    this.currentOperation.operandA = result;
+  }
+  
+  createNewOperation() {
+    this.currentOperation = { 
+      inputSessionIsClosed: true,
+      input: [0], 
+      operandA: null, 
+      operandB: null, 
+      operationType: null, 
+      result: null };
+    }
 
-  setNextOperation(result) {
-    this.clearOperation(); 
-    this.currentOperation.a = result;
-    this.input = [];
-    debugger
+  checkIfOperationIsPossible() {
+    const { operandA, operandB, operationType } = this.currentOperation;
+    let test = [operandA, operandB, operationType];
+    console.log('possibility of operation', test);
+    return (operandA && operandB && operationType) ? true : false;
+  }
+  
+  init() {
+    this.createNewOperation();
+    this.updateOutput();
   }
 }
 
@@ -87,13 +123,157 @@ let calc = new Calculator;
 resultNode = document.getElementsByClassName("result")[0];
 controlsNode = document.getElementsByClassName("controls")[0];
 
+calc.init();
+
 controlsNode.onclick = function(e) {
   const { target } = e;
   let value = target.getAttribute("data-action");
   
   if (target.classList.contains("number")) {
-    calc.handleNumberClick(value)
+    calc.addNumber(value)
   } else if (target.classList.contains("operator")) {
-    calc.handleOperatorClick(value);
-  } else return;
+    calc.closeInputSession();
+    calc.addOperationType(value);
+    
+  } else if (target.classList.contains("control")) {
+    calc.handleControlClick(value);
+  }
+  if (calc.checkIfOperationIsPossible()) {
+    calc.executeOperation();
+  }
+  console.log(calc.currentOperation);
+  calc.updateOutput();
+  return;
 }
+
+
+
+
+
+
+
+
+
+
+
+// // Click Handlers
+
+// addNumber(number) {
+//   const { inputSessionIsClosed } = this.currentOperation;
+//   if (inputSessionIsClosed) {
+//     this.createNewInputSession();
+//   }
+//   this.currentOperation.input.push(number);
+//   return;
+// }
+
+// addOperationType(value) {
+//   this.currentOperation.operationType = value;
+//   return;
+// }
+
+// checkIfOperationIsPossible() {
+//   const { operandA, operandB, operationType } = this.currentOperation;
+
+//   let test = [operandA, operandB, operationType];
+//   console.log('possibility of operation', test);
+//   return (operandA && operandB && operationType) ? true : false;
+// }
+
+// handleControlClick(value) {
+//   if (value === "clear") {
+//     this.createNewOperation();
+//   } else if (value === "result") {
+//     this.convertInputToOperand();
+//     this.executeOperation();
+//   } else return;
+// }
+
+// //Input Services
+// createNewInputSession() {
+//   this.currentOperation.inputSessionIsClosed = false;
+//   this.currentOperation.input = [];
+// }
+
+// closeInputSession() {
+//   this.currentOperation.inputSessionIsClosed = true;
+//   this.convertInputToOperand();
+// }
+
+// //Calculator Services
+
+// updateOutput() {
+//   const { input, result } = this.currentOperation;
+//   console.log(result);
+//   const output = result ? result : input.join('');
+//   resultNode.innerHTML = output;
+//   return;
+// }
+
+// convertInputToOperand () {
+//   const { input, operandA } = this.currentOperation;
+//   if (!operandA) {
+//     this.currentOperation.operandA = parseInt(input.join(''), 10);
+//   } else {
+//     this.currentOperation.operandB = parseInt(input.join(''), 10);
+//   }
+// }
+
+// executeOperation() {
+//   let { operandA, operandB, operationType} = this.currentOperation;
+//   const result = this[operationType](operandA, operandB);
+//   this.currentOperation.result = result;
+//   this.setNextOperation();
+//   return;
+// }
+
+// setNextOperation() {
+//   const result = this.currentOperation.result;
+//   this.createNewOperation(); 
+//   this.currentOperation.operandA = result;
+// }
+
+// createNewOperation() {
+//   this.currentOperation = { 
+//     inputSessionIsClosed: true,
+//     input: [0], 
+//     operandA: null, 
+//     operandB: null, 
+//     operationType: null, 
+//     result: null };
+// }
+
+// init() {
+//   this.createNewOperation();
+//   this.updateOutput();
+// }
+// }
+
+
+// let calc = new Calculator;
+
+// resultNode = document.getElementsByClassName("result")[0];
+// controlsNode = document.getElementsByClassName("controls")[0];
+
+// calc.init();
+
+// controlsNode.onclick = function(e) {
+// const { target } = e;
+// let value = target.getAttribute("data-action");
+
+// if (target.classList.contains("number")) {
+//   calc.addNumber(value)
+// } else if (target.classList.contains("operator")) {
+//   calc.closeInputSession();
+//   if (calc.checkIfOperationIsPossible()) {
+//     calc.executeOperation();
+//   }
+//   calc.addOperationType(value);
+  
+// } else if (target.classList.contains("control")) {
+//   calc.handleControlClick(value);
+// }
+// console.log(calc.currentOperation);
+// calc.updateOutput();
+// return;
+// }
