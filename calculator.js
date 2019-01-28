@@ -84,6 +84,7 @@ class Calculator {
       this.history.push(this.currentOperation);
       this.createNewOperation({a: result});
       this.updateOutput(result);
+      console.log(this.history);
     }
 
     this.currentOperation.operator = (value === "result") ? null : value;
@@ -127,7 +128,7 @@ controlsNode.onclick = function(e) {
   } else if (target.classList.contains("service")) {
     calc.handleServiceClick(value);
   }
+  console.log(`input: ${calc.input.value}`);
   console.log(calc.currentOperation);
-  console.log(calc.history);
   return;
 }
