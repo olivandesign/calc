@@ -1,8 +1,8 @@
 class Operation {
   constructor(props) {
     this.a = props.a ? props.a : null;
-    this.b = props.b ? props.b : null;
-    this.operator = props.operator ? props.operator: null;
+    this.operator = props.operator ? props.operator : null;
+    this.b = null;
     this.result = null;
   }
 
@@ -27,52 +27,83 @@ class Operation {
   }
 
   execute() {
-    this.result = this[operator]();
+    this.result = this[this.operator]();
     return this.result;
   }
 
-  executionIsPossible() {
+  checkIfExecutionIsPossible() {
     return (this.a && this.b && this.operator) ? true : false;
+  }
+}
+
+class InputSession {
+  constructor() {
+    this.value = [];
+    this.sessionIsClosed = false;
+  }
+
+  convertToDigit() {
+    return parseInt(this.value.join(''), 10);
+  }
+
+  closeSession() {
+    this.sessionIsClosed = true;
+    this.digit = this.convertToDigit();
+    return;
   }
 }
 
 class Calculator { 
   constructor() {
-    this.output = null;
-    this.inputSessionIsClosed = true;
-    this.input = null;
-    this.currentOperation = new Operation;
+    this.input = new InputSession;
+    this.currentOperation = null;
+    this.history = [];
   }
 
-  handleClick(target) {
-    let value = target.getAttribute("data-action");
-    const operation = this.currentOperation;
-    if (target.classList.contains("number")) {
-      calc.input.push(value);
-    } else if (target.classList.contains("operator")) {
-      calc.input = value;
-    } else if (target.classList.contains("control")) {
-      if (value === "clear") {
-        this.createNewOperation();
-      } else if (value === "result") {
-        if (operation.executionIsPossible()) {
-          operation.execute();
-        }
-      } else return;
+  handleDigitClick(value) {
+    if (this.input.sessionIsClosed) {
+      this.input = new InputSession;
     }
+    this.input.value.push(value);
+    this.updateOutput(this.input.convertToDigit());
   }
 
-  createNewInputSession() {
+  handleOperatorClick(value) {
+    if (!this.input.sessionIsClosed) {
+      const convertedInput = this.input.convertToDigit();
+      if (this.currentOperation.a) {
+        this.currentOperation.b = convertedInput;
+      } else {
+        this.currentOperation.a = convertedInput;
+      }
+      this.input.closeSession();
+    }
 
+    if (this.currentOperation.checkIfExecutionIsPossible()) {
+      const result = this.currentOperation.execute();
+      this.history.push(this.currentOperation);
+      this.createNewOperation({a: result});
+      this.updateOutput(result);
+    }
+
+    this.currentOperation.operator = (value === "result") ? null : value;
   }
 
-  convertInput() {
-
-  }
-
-  updateOutput() {
-    resultNode.innerHTML = this.output;
+  handleServiceClick(value) {
+    if (value === "clear") {
+      this.init();
+    }
     return;
+  }
+
+  updateOutput(value) {
+    resultNode.innerHTML = value;
+    return;
+  }
+
+  init() {
+    this.createNewOperation({});
+    this.updateOutput(0);
   }
 
   createNewOperation(operationProps) {
@@ -85,8 +116,18 @@ resultNode = document.getElementsByClassName("result")[0];
 controlsNode = document.getElementsByClassName("controls")[0];
 
 let calc = new Calculator;
+calc.init();
 controlsNode.onclick = function(e) {
-  calc.handleClick(e.target);
-  calc.updateOutput();
+  const { target } = e;
+  let value = target.getAttribute("data-action");
+  if (target.classList.contains("number")) {
+    calc.handleDigitClick(value);
+  } else if (target.classList.contains("operator")) {
+    calc.handleOperatorClick(value);
+  } else if (target.classList.contains("service")) {
+    calc.handleServiceClick(value);
+  }
+  console.log(calc.currentOperation);
+  console.log(calc.history);
   return;
 }
