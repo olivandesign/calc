@@ -1,7 +1,7 @@
 class Operation {
-  constructor(props) {
-    this.a = props.a ? props.a : null;
-    this.operator = props.operator ? props.operator : null;
+  constructor(result) {
+    this.a = result ? result : null;
+    this.operator = null;
     this.b = null;
     this.result = null;
   }
@@ -39,16 +39,20 @@ class Operation {
 class InputSession {
   constructor() {
     this.value = [];
+    this.isFloat = false;
     this.sessionIsClosed = false;
   }
 
   convertToDigit() {
-    return parseInt(this.value.join(''), 10);
+    if (this.isFloat) {
+      return parseFloat(this.value.join(''), 10);
+    } else {
+      return parseInt(this.value.join(''), 10);
+    }
   }
 
   closeSession() {
     this.sessionIsClosed = true;
-    this.digit = this.convertToDigit();
     return;
   }
 }
@@ -82,7 +86,7 @@ class Calculator {
     if (this.currentOperation.checkIfExecutionIsPossible()) {
       const result = this.currentOperation.execute();
       this.history.push(this.currentOperation);
-      this.createNewOperation({a: result});
+      this.createNewOperation(result);
       this.updateOutput(result);
       console.log(this.history);
     }
@@ -93,27 +97,30 @@ class Calculator {
   handleServiceClick(value) {
     if (value === "clear") {
       this.init();
+    } else if (value === "dot") {
+      this.input.isFloat = true;
+      this.input.value.push('.');
     }
     return;
   }
 
   updateOutput(value) {
-    resultNode.innerHTML = value;
+    outputNode.innerHTML = value;
     return;
   }
 
   init() {
-    this.createNewOperation({});
+    this.createNewOperation();
     this.updateOutput(0);
   }
 
-  createNewOperation(operationProps) {
-    this.currentOperation = new Operation(operationProps);
+  createNewOperation(lastResult) {
+    this.currentOperation = new Operation(lastResult);
     return;
   }
 }
 
-resultNode = document.getElementsByClassName("result")[0];
+outputNode = document.getElementsByClassName("output")[0];
 controlsNode = document.getElementsByClassName("controls")[0];
 
 let calc = new Calculator;
@@ -121,7 +128,7 @@ calc.init();
 controlsNode.onclick = function(e) {
   const { target } = e;
   let value = target.getAttribute("data-action");
-  if (target.classList.contains("number")) {
+  if (target.classList.contains("digit")) {
     calc.handleDigitClick(value);
   } else if (target.classList.contains("operator")) {
     calc.handleOperatorClick(value);

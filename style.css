@@ -1,6 +1,10 @@
+@import 'normalize.css';
+
 body {
   display: flex;
   background-color: #ccc;
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
 }
 
 .app {
@@ -9,12 +13,13 @@ body {
   background-color: white;
 }
 
-.result {
+.output {
   height: 80px;
   margin-bottom: 10px;
   background-color: #333;
   font-size: 48px;
   padding: 10px;
+  border-radius: 4px;
   color: white;
   display: flex;
   align-items: center;
@@ -30,15 +35,34 @@ body {
   justify-content: center;
   width: 100px;
   height: 100px;
-  margin: 1px;
-  background-color:white;
+  margin: 2px;
+  border: none;
+  border-radius: 4px;
+  background-color: hsl(0, 0%, 88%);
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: #eee;
+  background-color: hsl(0, 0%, 84%);
 }
 
 .line {
   flex: 1;
+}
+
+.operator {
+  background-color: hsl(0, 0%, 80%);
+}
+
+.clear {
+  background-color: hsl(0, 0%, 80%);
+}
+
+.result {
+  background-color: hsl(0, 0%, 48%);
+  color: white;
+}
+
+.result:hover {
+  background-color: hsl(0, 0%, 40%);
 }
