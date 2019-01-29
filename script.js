@@ -1,6 +1,6 @@
 class Operation {
   constructor(result) {
-    this.a = result ? result : null;
+    this.a = result || null;
     this.operator = null;
     this.b = null;
     this.result = null;
@@ -28,11 +28,11 @@ class Operation {
 
   execute() {
     this.result = this[this.operator]();
-    return this.result;
+    return;
   }
 
   checkIfExecutionIsPossible() {
-    return (this.a && this.b && this.operator) ? true : false;
+    return !!this.a && !!this.b && !!this.operator;
   }
 }
 
@@ -73,21 +73,22 @@ class Calculator {
   }
 
   handleOperatorClick(value) {
+    const { currentOperation } = this;
+
     if (!this.input.sessionIsClosed) {
-      const convertedInput = this.input.convertToDigit();
-      if (this.currentOperation.a) {
-        this.currentOperation.b = convertedInput;
+      if (currentOperation.a) {
+        this.currentOperation.b = this.input.convertToDigit();
       } else {
-        this.currentOperation.a = convertedInput;
+        this.currentOperation.a = this.input.convertToDigit();
       }
       this.input.closeSession();
     }
 
-    if (this.currentOperation.checkIfExecutionIsPossible()) {
-      const result = this.currentOperation.execute();
-      this.history.push(this.currentOperation);
-      this.createNewOperation(result);
-      this.updateOutput(result);
+    if (currentOperation.checkIfExecutionIsPossible()) {
+      currentOperation.execute();
+      this.history.push(currentOperation);
+      this.updateOutput(currentOperation.result);
+      this.createNewOperation(currentOperation.result);
       console.log(this.history);
     }
 
@@ -111,6 +112,7 @@ class Calculator {
 
   init() {
     this.createNewOperation();
+    this.input = new InputSession;
     this.updateOutput(0);
   }
 
@@ -128,12 +130,16 @@ calc.init();
 controlsNode.onclick = function(e) {
   const { target } = e;
   let value = target.getAttribute("data-action");
-  if (target.classList.contains("digit")) {
-    calc.handleDigitClick(value);
-  } else if (target.classList.contains("operator")) {
+  switch (true) {
+    case target.classList.contains("digit"):
+      calc.handleDigitClick(value);
+      break;
+    case target.classList.contains("operator"):
     calc.handleOperatorClick(value);
-  } else if (target.classList.contains("service")) {
-    calc.handleServiceClick(value);
+      break;
+    case target.classList.contains("service"):
+      calc.handleServiceClick(value);
+      break;
   }
   console.log(`input: ${calc.input.value}`);
   console.log(calc.currentOperation);
